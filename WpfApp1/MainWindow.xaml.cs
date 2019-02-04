@@ -36,6 +36,15 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            Int32 ordinal = Int32.Parse(((Button)sender).Tag.ToString());
+
+            var current = Persons.First(p => p.Ordinal == ordinal);
+            var below = Persons.First(p => p.Ordinal == ordinal + 1);
+
+            current.Ordinal = ordinal + 1;
+            below.Ordinal = ordinal;
+
+            DataGrid1.ScrollIntoView(current);
             //ContentPresenter contentPresenter = this.ItemsControl1.ItemContainerGenerator.ContainerFromIndex(Int32.Parse(ScrollToIndex.Text)) as ContentPresenter;
             //contentPresenter.BringIntoView();
         }

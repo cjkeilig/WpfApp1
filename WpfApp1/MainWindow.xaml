@@ -4,21 +4,41 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        xmlns:clr="clr-namespace:System;assembly=mscorlib"
         x:Name="MainWindow1"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.Resources>
-            <DataTemplate x:Key="NameTemplate" >
-                <TextBox Text="{Binding Name}" FontSize="12" HorizontalAlignment="Right" />
-            </DataTemplate>
-            <DataTemplate x:Key="DescriptionTemplate" >
-                <TextBox Text="{Binding Description}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Left" />
-            </DataTemplate>
+            <CollectionViewSource IsLiveSortingRequested="True" x:Key="cvsPersons" Source="{Binding Path=Persons, RelativeSource={RelativeSource AncestorType=local:MainWindow}, Mode=TwoWay}">
+                <CollectionViewSource.SortDescriptions>
+                    <scm:SortDescription PropertyName="Ordinal" Direction="Ascending">
+                    </scm:SortDescription>
+                </CollectionViewSource.SortDescriptions>
+                <CollectionViewSource.LiveSortingProperties>
+                    <clr:String>Ordinal</clr:String>
+                </CollectionViewSource.LiveSortingProperties>
+
+            </CollectionViewSource>
             <!--DataTemplate for the Published Date column when in edit mode. -->
             <!--<DataTemplate x:Key="EditingDateTemplate">
                 <DatePicker SelectedDate="{Binding PublishDate}"  />
             </DataTemplate>-->
+            <Style x:Key="DefaultTextBoxStyle" TargetType="TextBox">
+                <Setter Property="Margin" Value="3"/>
+                <Setter Property="Padding" Value="2" />
+                <Setter Property="CharacterCasing" Value="Upper"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="Height" Value="32" />
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+            <Style x:Key="DefaultTextBlockStyle" TargetType="Label">
+                <Setter Property="Margin" Value="3"/>
+                <Setter Property="Padding" Value="2" />
+                <Setter Property="Height" Value="32"/>
+            </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
@@ -27,35 +47,80 @@
         <StackPanel Orientation="Horizontal" Grid.Row="0">
             <TextBlock>Test Application</TextBlock>
             <Button>Button 1</Button>
-            <Button Click="Button_Click">Button 2</Button>
-            <TextBox x:Name="ScrollToIndex"></TextBox>
+            <Button Tag="{Binding ElementName=DataGrid1, Path=SelectedIndex}" Click="Button_Click">Button 2</Button>
+            <TextBox MinWidth="32" x:Name="ScrollToIndex"></TextBox>
         </StackPanel>
         <!--<ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-            <ItemsControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" x:Name="ItemsControl1" ItemsSource="{Binding Path=Persons}">
+            --><!--<ItemsControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" x:Name="ItemsControl1" ItemsSource="{Binding Path=Persons}">--><!--
+            <ItemsControl ItemsSource="{Binding Path=., Source={StaticResource cvsPersons}, Mode=TwoWay}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Path=Name}"></TextBlock>
-                            <TextBlock Text="{Binding Path=Description}"></TextBlock>
+                            <TextBlock Text="{Binding Ordinal}"></TextBlock>
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                            <TextBlock Text="{Binding Description}"></TextBlock>
                             <Button>Item Button 1</Button>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>-->
-        
-        <DataGrid 
+
+        <DataGrid
             GridLinesVisibility="None"
             HeadersVisibility="None" 
-            AutoGenerateColumns="False"  
+            AutoGenerateColumns="False"
             Grid.Row="1" 
-            DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" 
             x:Name="DataGrid1" 
-            ItemsSource="{Binding Path=Persons}">
+            ItemsSource="{Binding Source={StaticResource cvsPersons}}">
             <DataGrid.Columns>
-                <DataGridTemplateColumn CellTemplate="{StaticResource NameTemplate}" CellEditingTemplate="{StaticResource NameTemplate}"></DataGridTemplateColumn>
-                <DataGridTemplateColumn CellTemplate="{StaticResource DescriptionTemplate}" CellEditingTemplate="{StaticResource DescriptionTemplate}" ></DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox Style="{Binding Source={StaticResource DefaultTextBoxStyle}}" Text="{Binding Name}" HorizontalAlignment="Right"  />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Style="{Binding Source={StaticResource DefaultTextBlockStyle}}" VerticalContentAlignment="Center" HorizontalAlignment="Center" Foreground="Black">=</Label>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox MinWidth="500" Style="{Binding Source={StaticResource DefaultTextBoxStyle}}" Text="{Binding Description}" FontWeight="Bold" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
+            <DataGrid.RowStyle>
+
+                <Style TargetType="DataGridRow">
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Margin" Value="3"/>
+                    <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="BorderBrush" Value="Green" />
+                            <Setter Property="BorderThickness" Value="3"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.CellStyle >
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
         </DataGrid>
     </Grid>
 </Window>

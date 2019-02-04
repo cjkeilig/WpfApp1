@@ -36,15 +36,32 @@ namespace WpfApp1
             }
         }
 
+        public static readonly PropertyInfo<Int32> PropertyOrdinal = RegisterProperty<Int32>(c => c.Ordinal);
+        public Int32 Ordinal
+        {
+            get
+            {
+                return GetProperty<Int32>(PropertyOrdinal);
+            }
+            set
+            {
+                SetProperty<Int32>(PropertyOrdinal, value);
+            }
+        }
+
+
+
 
         internal void Child_Fetch(PersonDto personDto)
         {
             LoadProperty(PropertyName, personDto.Name);
             LoadProperty(PropertyDescription, personDto.Description);
+            LoadProperty(PropertyOrdinal, personDto.Ordinal);
+
         }
 
 
-        
+
     }
 
     [Serializable]
@@ -56,15 +73,10 @@ namespace WpfApp1
 
             for (int i = 0; i < 100; i++)
             {
-                var personOne = DataPortal.FetchChild<Person>(new PersonDto() { Name = "Test 1", Description = "Test 1 Description" });
-                var personTwo = DataPortal.FetchChild<Person>(new PersonDto() { Name = "Test 2", Description = "Test 2 Description" });
+                var person = DataPortal.FetchChild<Person>(new PersonDto() { Name = "Test " + (99-i).ToString(), Description = "Test " + (99-i).ToString() + " Description", Ordinal=99 - i });
 
-                Add(personOne);
-                Add(personTwo);
+                Add(person);
             }
-
-
-
 
             RaiseListChangedEvents = true;
 
@@ -76,11 +88,13 @@ namespace WpfApp1
         {
             return DataPortal.FetchChild<PersonList>();
         }
+
     }
 
     public class PersonDto
     {
         public string Name;
         public string Description;
+        public Int32 Ordinal;
     }
 }
