@@ -39,8 +39,6 @@ namespace WpfApp1
     /// <summary>
     /// This class represents an undo and redo history.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <seealso cref="IMemento&lt;T&gt;"/>
     [Serializable]
     public class UndoRedoHistory<T>
     {
@@ -52,9 +50,6 @@ namespace WpfApp1
         [NonSerialized]
         private CompoundMemento<T> tempMemento = null;
 
-        /// <summary>
-        /// The subject that this undo redo history is about.
-        /// </summary>
         protected T subject;
 
 #if LIMITED_CAPACITY
@@ -69,11 +64,11 @@ namespace WpfApp1
         protected RoundStack<IMemento<T>> redoStack;
 
         /// <summary>
-        /// Creates <see cref="UndoRedoHistory&lt;T&gt;"/> with default capacity.
+        /// Creates <see cref="UndoRedoHistory<typeparamref name="T"/>"/> with default capacity.
         /// </summary>
         /// <param name="subject"></param>
-        public UndoRedoHistory(T subject)
-            : this(subject, DEFAULT_CAPACITY)
+        public UndoRedoHistory(/*T subject*/)
+            : this(/*subject,*/ DEFAULT_CAPACITY)
         {
         }
 
@@ -82,9 +77,9 @@ namespace WpfApp1
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="capacity"></param>
-        public UndoRedoHistory(T subject, int capacity)
+        public UndoRedoHistory(/*T subject,*/ int capacity)
         {
-            this.subject = subject;
+            //this.subject = subject;
             undoStack = new RoundStack<IMemento<T>>(capacity);
             redoStack = new RoundStack<IMemento<T>>(capacity);
         }
@@ -117,7 +112,7 @@ namespace WpfApp1
         /// That could occur in the following scenario:
         /// event X causees a Do action and certain Undo / Redo action causes event X, 
         /// i.e. Undo / Redo causes a Do action, which will render history in a incorrect state.
-        /// So whenever <see cref="Do(IMemento&lt;T&gt;)"/> is called, the status of <see cref="InUndoRedo"/> 
+        /// So whenever <see cref="CheckPoint(IMemento&lt;T&gt;)"/> is called, the status of <see cref="InUndoRedo"/> 
         /// should aways be checked first. Example:
         /// <code>
         /// void SomeEventHandler() 
@@ -163,8 +158,8 @@ namespace WpfApp1
         /// <remarks>
         /// From the time this method is called till the time 
         /// <see cref=" EndCompoundDo()"/> is called, all the <i>DO</i> actions (by calling 
-        /// <see cref="Do(IMemento&lt;T&gt;)"/>) are added into a temporary 
-        /// <see cref="CompoundMemento&lt;T&gt;"/> and this memnto will be pushed into the undo 
+        /// <see cref="Do(IMemento<typeparamref name="T"/>)"/>) are added into a temporary 
+        /// <see cref="CompoundMemento<typeparamref name="T"/>"/> and this memnto will be pushed into the undo 
         /// stack when <see cref="EndCompoundDo()"/> is called. 
         /// <br/>
         /// If this method is called, it's programmer's responsibility to call <see cref="EndCompoundDo()"/>, 
@@ -195,12 +190,12 @@ namespace WpfApp1
         /// Thrown if previous grouping wasn't ended. See <see cref="EndCompoundDo"/>.
         /// </exception>
         /// <seealso cref="EndCompoundDo()"/>
-        public void BeginCompoundDo()
+        public void BeginCompoundDo(int pointerIndex)
         {
             if (tempMemento != null)
                 throw new InvalidOperationException("Previous complex memento wasn't commited.");
 
-            tempMemento = new CompoundMemento<T>();
+            tempMemento = new CompoundMemento<T>(pointerIndex);
         }
 
         /// <summary>
@@ -228,14 +223,14 @@ namespace WpfApp1
         /// <remarks>
         /// This method MUST be properly involked by programmers right before (preferably) or right after 
         /// the state of <see cref="subject"/> is changed. 
-        /// Whenever <see cref="Do(IMemento&lt;T&gt;)"/> is called, the status of <see cref="InUndoRedo"/> 
+        /// Whenever <see cref="Do(IMemento<typeparamref name="T"/>)"/> is called, the status of <see cref="InUndoRedo"/> 
         /// should aways be checked first. See details at <see cref="InUndoRedo"/>. 
         /// This method causes redo stack to be cleared.
         /// </remarks>
         /// <seealso cref="InUndoRedo"/>
         /// <seealso cref="Undo()"/>
         /// <seealso cref="Redo()"/>
-        public void Do(IMemento<T> m)
+        public void CheckPoint(IMemento<T> m)
         {
             if (inUndoRedo)
                 throw new InvalidOperationException("Involking do within an undo/redo action.");
@@ -265,7 +260,7 @@ namespace WpfApp1
         /// Method <see cref="CanUndo()"/> can be called before calling this method.
         /// </summary>
         /// <seealso cref="Redo()"/>
-        public void Undo()
+        public T Undo()
         {
             if (tempMemento != null)
                 throw new InvalidOperationException("The complex memento wasn't commited.");
@@ -274,6 +269,8 @@ namespace WpfApp1
             IMemento<T> top = undoStack.Pop();
             redoStack.Push(top.Restore(subject));
             inUndoRedo = false;
+
+            return top.GetPointer();
         }
 
         /// <summary>
@@ -281,7 +278,7 @@ namespace WpfApp1
         /// Method <see cref="CanRedo()"/> can be called before calling this method.
         /// </summary>
         /// <seealso cref="Undo()"/>
-        public void Redo()
+        public T Redo()
         {
             if (tempMemento != null)
                 throw new InvalidOperationException("The complex memento wasn't commited.");
@@ -290,6 +287,8 @@ namespace WpfApp1
             IMemento<T> top = redoStack.Pop();
             undoStack.Push(top.Restore(subject));
             inUndoRedo = false;
+
+            return top.GetPointer();
         }
 
         /// <summary>
@@ -339,6 +338,12 @@ namespace WpfApp1
                 return redoStack.Peek();
             else
                 return null;
+        }
+
+        public void DiscardTop()
+        {
+            if (undoStack.Count > 0)
+                undoStack.Pop();
         }
 
     }

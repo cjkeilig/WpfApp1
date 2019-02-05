@@ -36,20 +36,30 @@ namespace WpfApp1
     /// <summary>
     /// A class used to group multiple mementos together, which can be pushed on to the undo stack as a single memento. 
     /// With this class, multiple consecutive actions can be recognized as a single action, which are undo as an entity. 
-    /// It also implements the <see cref="IMemento&lt;T&gt;"/> interface, which means one <see cref="CompoundMemento&lt;T&gt;"/> can be a 
-    /// member of another <see cref="CompoundMemento&lt;T&gt;"/>. Therefore it is possible to create hierachical mementos. 
+    /// It also implements the <see cref="IMemento<typeparamref name="T"/>"/> interface, which means one <see cref="CompoundMemento&lt;T&gt;"/> can be a 
+    /// member of another <see cref="CompoundMemento<typeparamref name="T"/>"/>. Therefore it is possible to create hierachical mementos. 
     /// </summary>
-    /// <seealso cref="IMemento&lt;T&gt;"/>
+    /// <seealso cref="IMemento<typeparam name="T"></typeparam>/>
     [Serializable]
     public class CompoundMemento<T> : IMemento<T>
-    {        
+    {
         private List<IMemento<T>> mementos = new List<IMemento<T>>();
-        
-        /// <summary>
-        /// Adds memento to this complex memento. Note that the order of adding mementos is critical.
-        /// </summary>
-        /// <param name="m"></param>
-        public void Add(IMemento<T> m)
+        private int pointerIndex;
+
+
+        public CompoundMemento(int pointerIndex) 
+        {
+
+            this.pointerIndex = pointerIndex;
+        }
+
+
+
+    /// <summary>
+    /// Adds memento to this complex memento. Note that the order of adding mementos is critical.
+    /// </summary>
+    /// <param name="m"></param>
+    public void Add(IMemento<T> m)
         {
             mementos.Add(m);
         }
@@ -65,13 +75,13 @@ namespace WpfApp1
         #region IMemento Members
 
         /// <summary>
-        /// Implicity implememntation of <see cref="IMemento&lt;T&gt;.Restore(T)"/>, which returns <see cref="CompoundMemento&lt;T&gt;"/>
+        /// Implicity implememntation of <see cref="IMemento&lt;T&gt;.Restore(T)"/>, which returns <see cref="CompoundMemento<typeparamref name="T"/>"/>
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
         public CompoundMemento<T> Restore(T target)
         {
-            CompoundMemento<T> inverse = new CompoundMemento<T>();
+            CompoundMemento<T> inverse = new CompoundMemento<T>(pointerIndex);
             //starts from the last action
             for (int i = mementos.Count - 1; i >= 0; i--)
                 inverse.Add(mementos[i].Restore(target));
@@ -79,13 +89,19 @@ namespace WpfApp1
         }
 
         /// <summary>
-        /// Explicity implememntation of <see cref="IMemento&lt;T&gt;.Restore(T)"/>
+        /// Explicity implememntation of <see cref="IMemento<typeparamref name="T"/>.Restore(T)"/>
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
         IMemento<T> IMemento<T>.Restore(T target)
         {
             return Restore(target);
+        }
+
+        public T GetPointer()
+        {
+            // Return the last Memento
+            return mementos[pointerIndex].GetPointer();
         }
 
         #endregion

@@ -11,7 +11,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.Resources>
-            <CollectionViewSource x:Key="cvsPersons" IsLiveSortingRequested="True"  Source="{Binding Path=Persons, RelativeSource={RelativeSource AncestorType=local:MainWindow}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <CollectionViewSource Filter="CollectionViewSource_Filter" x:Key="cvsPersons" IsLiveFilteringRequested="True" IsLiveSortingRequested="True"  Source="{Binding Path=Persons, RelativeSource={RelativeSource AncestorType=local:MainWindow}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <CollectionViewSource.SortDescriptions>
                     <scm:SortDescription PropertyName="Ordinal" Direction="Ascending">
                     </scm:SortDescription>
@@ -19,7 +19,9 @@
                 <CollectionViewSource.LiveSortingProperties>
                     <clr:String>Ordinal</clr:String>
                 </CollectionViewSource.LiveSortingProperties>
-
+                <CollectionViewSource.LiveFilteringProperties>
+                    <clr:String>Deleted</clr:String>
+                </CollectionViewSource.LiveFilteringProperties>
             </CollectionViewSource>
             <!--DataTemplate for the Published Date column when in edit mode. -->
             <!--<DataTemplate x:Key="EditingDateTemplate">
@@ -47,7 +49,12 @@
                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="BorderBrush" Value="DarkGray" />
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="BorderBrush" Value="LightBlue"/>
+                    </Trigger>
 
+                </Style.Triggers>
 
             </Style>
         </Grid.Resources>
@@ -58,11 +65,15 @@
         <StackPanel Orientation="Horizontal" Grid.Row="0">
             <TextBlock>Test Application</TextBlock>
             <Button Click="ButtonUndo_Click">Button 1</Button>
-            <Button Tag="{Binding ElementName=DataGrid1, Path=SelectedIndex}" Click="Button_Click">Button 2</Button>
+            <Button Tag="{Binding ElementName=DataGrid1, Path=SelectedIndex}" Click="Button_Click" BorderBrush="#FF707070">Button 2
+            </Button>
+            <Button Click="ButtonDelete_Click" Tag="{Binding ElementName=DataGrid1, Path=SelectedItem}">Delete</Button>
             <TextBox MinWidth="32" x:Name="ScrollToIndex"></TextBox>
         </StackPanel>
         <!--<ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-            --><!--<ItemsControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" x:Name="ItemsControl1" ItemsSource="{Binding Path=Persons}">--><!--
+            -->
+        <!--<ItemsControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" x:Name="ItemsControl1" ItemsSource="{Binding Path=Persons}">-->
+        <!--
             <ItemsControl ItemsSource="{Binding Path=., Source={StaticResource cvsPersons}, Mode=TwoWay}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -104,7 +115,7 @@
                         </Style>
                     </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
-                        
+
                         <DataTemplate>
                             <Label Style="{StaticResource DefaultTextBlockStyle}" VerticalContentAlignment="Center" HorizontalAlignment="Center" BorderThickness="0">=</Label>
                         </DataTemplate>
@@ -113,11 +124,11 @@
                 <DataGridTemplateColumn MinWidth="350" CellStyle="{StaticResource DefaultDataGridCellStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Tag="{Binding Path=.}" Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
+                            <TextBox Tag="{Binding Path=.}" Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
                         </DataTemplate>
-                        
+
                     </DataGridTemplateColumn.CellTemplate>
-                    
+
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
             <DataGrid.RowStyle>

@@ -1,4 +1,5 @@
 ﻿using Csla;
+using Csla.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace WpfApp1
 {
     [Serializable]
-    public class Person : Csla.BusinessBase<Person>
+    public class Person : Csla.BusinessBase<Person>, IRestorePropertyInternal
     {
         public static readonly PropertyInfo<String> PropertyName = RegisterProperty<String>(c => c.Name);
         public string Name
@@ -47,11 +48,19 @@ namespace WpfApp1
             {
                 SetProperty<Int32>(PropertyOrdinal, value);
             }
-        } 
+        }
 
-        public void RestorePropertyInternal<T>(PropertyInfo<T> propertyInfo, T value)
+        public static readonly PropertyInfo<Boolean> PropertyDeleted = RegisterProperty<Boolean>(c => c.Deleted);
+        public Boolean Deleted
         {
-            SetProperty(propertyInfo, value);
+            get
+            {
+                return GetProperty<Boolean>(PropertyDeleted);
+            }
+            set
+            {
+                SetProperty<Boolean>(PropertyDeleted, value);
+            }
         }
 
 
@@ -63,10 +72,14 @@ namespace WpfApp1
 
         }
 
+        public void RestorePropertyInternal(IPropertyInfo propertyInfo, object value)
+        {
+            SetProperty(propertyInfo, value);
+        }
     }
 
     [Serializable]
-    public class PersonList : Csla.BusinessListBase<PersonList, Person>
+    public class PersonList : Csla.BusinessListBase<PersonList, Person>, ITrack<Person>
     {
         internal void Child_Fetch()
         {
@@ -90,6 +103,12 @@ namespace WpfApp1
             return DataPortal.FetchChild<PersonList>();
         }
 
+        public UndoRedoHistory<Person> GetTracker()
+        {
+            var undoRedoHistory = new UndoRedoHistory<Person>();
+
+            return undoRedoHistory;
+        }
     }
 
     public class PersonDto
@@ -99,26 +118,37 @@ namespace WpfApp1
         public Int32 Ordinal;
     }
 
-    public class PersonPropertyChangedMemento<T> : IMemento<PersonList>
+    public class CslaPropertyChangedMemento<T, C> : IMemento<T>
+        where T : BusinessBase<T>, IRestorePropertyInternal
     {
-        private PropertyInfo<T> _propertyInfo;
-        private T _value;
-        private Person _person;
 
-        public PersonPropertyChangedMemento(PropertyInfo<T> propertyInfo, T value, Person person)
+        private T _child;
+        private PropertyInfo<C> _propertyInfo;
+        private C _value;
+
+
+        public CslaPropertyChangedMemento(T person, PropertyInfo<C> propertyInfo, C value)
         {
             this._propertyInfo = propertyInfo;
             this._value = value;
-            this._person = person;
+            this._child = person;
         }
 
-        public IMemento<PersonList> Restore(PersonList target)
+        public IMemento<T> Restore(T target)
         {
-            var returnMemento = new PersonPropertyChangedMemento<T>(_propertyInfo, _value, _person);
-            _person.RestorePropertyInternal(_propertyInfo, _value);
+            var returnMemento = new CslaPropertyChangedMemento<T, C>(_child, _propertyInfo, _value);
+            _child.RestorePropertyInternal(_propertyInfo, _value);
             return returnMemento;
+        }
+
+        public T GetPointer()
+        {
+            return _child;
         }
     }
 
-
+    public interface IRestorePropertyInternal
+    {
+        void RestorePropertyInternal(IPropertyInfo propertyInfo, object value);
+    }
 }
