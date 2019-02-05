@@ -11,7 +11,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.Resources>
-            <CollectionViewSource IsLiveSortingRequested="True" x:Key="cvsPersons" Source="{Binding Path=Persons, RelativeSource={RelativeSource AncestorType=local:MainWindow}, Mode=TwoWay}">
+            <CollectionViewSource x:Key="cvsPersons" IsLiveSortingRequested="True"  Source="{Binding Path=Persons, RelativeSource={RelativeSource AncestorType=local:MainWindow}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <CollectionViewSource.SortDescriptions>
                     <scm:SortDescription PropertyName="Ordinal" Direction="Ascending">
                     </scm:SortDescription>
@@ -26,18 +26,29 @@
                 <DatePicker SelectedDate="{Binding PublishDate}"  />
             </DataTemplate>-->
             <Style x:Key="DefaultTextBoxStyle" TargetType="TextBox">
-                <Setter Property="Margin" Value="3"/>
                 <Setter Property="Padding" Value="2" />
                 <Setter Property="CharacterCasing" Value="Upper"/>
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="FontFamily" Value="Tahoma"/>
                 <Setter Property="Height" Value="32" />
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="BorderThickness" Value="0"/>
             </Style>
             <Style x:Key="DefaultTextBlockStyle" TargetType="Label">
-                <Setter Property="Margin" Value="3"/>
                 <Setter Property="Padding" Value="2" />
                 <Setter Property="Height" Value="32"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Background" Value="Transparent"/>
+
+            </Style>
+
+            <Style x:Key="DefaultDataGridCellStyle" TargetType="DataGridCell">
+                <Setter Property="Margin" Value="3" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="DarkGray" />
+
+
             </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
@@ -46,7 +57,7 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0">
             <TextBlock>Test Application</TextBlock>
-            <Button>Button 1</Button>
+            <Button Click="ButtonUndo_Click">Button 1</Button>
             <Button Tag="{Binding ElementName=DataGrid1, Path=SelectedIndex}" Click="Button_Click">Button 2</Button>
             <TextBox MinWidth="32" x:Name="ScrollToIndex"></TextBox>
         </StackPanel>
@@ -74,34 +85,48 @@
             x:Name="DataGrid1" 
             ItemsSource="{Binding Source={StaticResource cvsPersons}}">
             <DataGrid.Columns>
-                <DataGridTemplateColumn>
+                <DataGridTemplateColumn MinWidth="100" CellStyle="{StaticResource DefaultDataGridCellStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Style="{Binding Source={StaticResource DefaultTextBoxStyle}}" Text="{Binding Name}" HorizontalAlignment="Right"  />
+                            <TextBox Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"  />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
+                        
                         <DataTemplate>
-                            <Label Style="{Binding Source={StaticResource DefaultTextBlockStyle}}" VerticalContentAlignment="Center" HorizontalAlignment="Center" Foreground="Black">=</Label>
+                            <Label Style="{StaticResource DefaultTextBlockStyle}" VerticalContentAlignment="Center" HorizontalAlignment="Center" BorderThickness="0">=</Label>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn>
+                <DataGridTemplateColumn MinWidth="350" CellStyle="{StaticResource DefaultDataGridCellStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox MinWidth="500" Style="{Binding Source={StaticResource DefaultTextBoxStyle}}" Text="{Binding Description}" FontWeight="Bold" HorizontalAlignment="Left"/>
+                            <TextBox Tag="{Binding Path=.}" Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
                         </DataTemplate>
+                        
                     </DataGridTemplateColumn.CellTemplate>
+                    
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
             <DataGrid.RowStyle>
 
                 <Style TargetType="DataGridRow">
-                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="BorderThickness" Value="3" />
                     <Setter Property="Margin" Value="3"/>
                     <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="BorderBrush" Value="Green" />
@@ -110,17 +135,6 @@
                     </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>
-            <DataGrid.CellStyle >
-                <Style TargetType="DataGridCell">
-                    <Setter Property="BorderBrush" Value="Transparent"/>
-                    <Setter Property="BorderThickness" Value="0" />
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="Transparent"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.CellStyle>
         </DataGrid>
     </Grid>
 </Window>

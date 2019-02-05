@@ -20,18 +20,21 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
+        private UndoRedoHistory<PersonList> _undoRedoHistory;
+
         public PersonList Persons { get; set; }
+        public ListCollectionView CvsPersons { get; set; }
 
         public MainWindow()
         {
 
             InitializeComponent();
             Persons = PersonList.GetSampleData();
-
-            //this.ItemsControl1.ItemsSource = Persons;
-
-            
-
+            CvsPersons = (ListCollectionView)CollectionViewSource.GetDefaultView(Persons);
+            CvsPersons.IsLiveSorting = true;
+            CvsPersons.SortDescriptions.Add(new System.ComponentModel.SortDescription("Ordinal", System.ComponentModel.ListSortDirection.Ascending));
+            CvsPersons.LiveSortingProperties.Add("Ordinal");
+            _undoRedoHistory = new UndoRedoHistory<PersonList>(Persons);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -45,8 +48,28 @@ namespace WpfApp1
             below.Ordinal = ordinal;
 
             DataGrid1.ScrollIntoView(current);
-            //ContentPresenter contentPresenter = this.ItemsControl1.ItemContainerGenerator.ContainerFromIndex(Int32.Parse(ScrollToIndex.Text)) as ContentPresenter;
-            //contentPresenter.BringIntoView();
+        }
+
+        private void ButtonUndo_Click(object sender, RoutedEventArgs e)
+        {
+            if (_undoRedoHistory.CanUndo)
+                _undoRedoHistory.Undo();
+        }
+
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+
+            //var selectedItem = DataGrid1.SelectedItem as Person;
+            //PersonPropertyChangedMemento<String> personPropertyChangedMemento = new PersonPropertyChangedMemento<String>(Person.PropertyDescription, selectedItem.Description, selectedItem);
+            //_undoRedoHistory.Do(personPropertyChangedMemento);
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = ((TextBox)sender).Tag as Person;
+            PersonPropertyChangedMemento<String> personPropertyChangedMemento = new PersonPropertyChangedMemento<String>(Person.PropertyDescription, selectedItem.Description, selectedItem);
+            _undoRedoHistory.Do(personPropertyChangedMemento);
+
         }
     }
 }
