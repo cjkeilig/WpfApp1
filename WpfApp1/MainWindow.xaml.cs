@@ -24,7 +24,7 @@ namespace WpfApp1
         private UndoRedoHistory<Person> _undoRedoHistory;
 
         public PersonList Persons { get; set; }
-        public ListCollectionView CvsPersons { get; set; }
+        //public ListCollectionView CvsPersons { get; set; }
         
 
         public MainWindow()
@@ -32,7 +32,7 @@ namespace WpfApp1
 
             InitializeComponent();
             Persons = PersonList.GetSampleData();
-            CvsPersons = (ListCollectionView)CollectionViewSource.GetDefaultView(Persons);
+            //CvsPersons = (ListCollectionView)CollectionViewSource.GetDefaultView(Persons);
 
 
 
@@ -72,7 +72,8 @@ namespace WpfApp1
                 Person person = _undoRedoHistory.Undo();
 
                 DataGrid1.SelectedItem = person;
-                CvsPersons.Refresh();
+                DataGrid1.CurrentItem = person;
+                //selectedRow.BringIntoView();
                 DataGrid1.ScrollIntoView(person);
             }
 

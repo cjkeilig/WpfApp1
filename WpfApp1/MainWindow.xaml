@@ -124,7 +124,10 @@
                 <DataGridTemplateColumn MinWidth="350" CellStyle="{StaticResource DefaultDataGridCellStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Tag="{Binding Path=.}" Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
+                            <DockPanel>
+                                <TextBox DockPanel.Dock="Left" Tag="{Binding Path=.}" Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
+                                <Image DockPanel.Dock="Right" HorizontalAlignment="Right" Source="C:\Users\unouser\Downloads\download.png"></Image>
+                            </DockPanel>
                         </DataTemplate>
 
                     </DataGridTemplateColumn.CellTemplate>
@@ -142,10 +145,13 @@
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="BorderBrush" Value="Green" />
                             <Setter Property="BorderThickness" Value="3"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+
                         </Trigger>
                     </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>
         </DataGrid>
+        
     </Grid>
 </Window>
