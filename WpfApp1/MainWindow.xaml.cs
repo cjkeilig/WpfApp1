@@ -21,7 +21,7 @@ namespace WpfApp1
     public partial class MainWindow : Window
     {
         private string _textAtGotFocus;
-        private UndoRedoHistory<Person> _undoRedoHistory;
+        private IUndoRedoHistory<PersonList, Person> _undoRedoHistory;
 
         public PersonList Persons { get; set; }
         //public ListCollectionView CvsPersons { get; set; }
@@ -51,17 +51,21 @@ namespace WpfApp1
 
             _undoRedoHistory.BeginCompoundDo(0); // Passing in zero to get the first memento pointer back
 
-            CslaPropertyChangedMemento<Person, int> MoveDownPropertyChangedMemento = new CslaPropertyChangedMemento<Person, int>(current, Person.PropertyOrdinal, current.Ordinal);
-            CslaPropertyChangedMemento<Person, int> MoveUpPropertyChangedMemento = new CslaPropertyChangedMemento<Person, int>(below, Person.PropertyOrdinal, below.Ordinal);
+            PropertyChangedMemento<PersonList, Person, int> MoveDownPropertyChangedMemento = new PropertyChangedMemento<PersonList, Person, int>(current, Person.PropertyOrdinal, current.Ordinal);
+            PropertyChangedMemento<PersonList, Person, int> MoveUpPropertyChangedMemento = new PropertyChangedMemento<PersonList, Person, int>(below, Person.PropertyOrdinal, below.Ordinal);
+            MoveItemDownMemento<PersonList, Person> moveItemDownMemento = new MoveItemDownMemento<PersonList, Person>(current, ordinal + 1);
 
             _undoRedoHistory.CheckPoint(MoveDownPropertyChangedMemento);
             _undoRedoHistory.CheckPoint(MoveUpPropertyChangedMemento);
+            _undoRedoHistory.CheckPoint(moveItemDownMemento);
+
 
             _undoRedoHistory.EndCompoundDo();
 
             current.Ordinal = ordinal + 1;
             below.Ordinal = ordinal;
 
+            Persons.Move(ordinal, ordinal + 1);
             DataGrid1.ScrollIntoView(current);
         }
 
@@ -71,10 +75,10 @@ namespace WpfApp1
             {
                 Person person = _undoRedoHistory.Undo();
 
-                DataGrid1.SelectedItem = person;
-                DataGrid1.CurrentItem = person;
-                //selectedRow.BringIntoView();
-                DataGrid1.ScrollIntoView(person);
+                //DataGrid1.SelectedItem = person;
+                //DataGrid1.CurrentItem = person;
+                ////selectedRow.BringIntoView();
+                //DataGrid1.ScrollIntoView(person);
             }
 
         }
@@ -97,7 +101,7 @@ namespace WpfApp1
             if (selectedItem is null)
                 return;
 
-            CslaPropertyChangedMemento<Person, String> personPropertyChangedMemento = new CslaPropertyChangedMemento<Person, String>(selectedItem, Person.PropertyDescription, selectedItem.Description);
+            PropertyChangedMemento<PersonList, Person, String> personPropertyChangedMemento = new PropertyChangedMemento<PersonList, Person, String>(selectedItem, Person.PropertyDescription, selectedItem.Description);
             _undoRedoHistory.CheckPoint(personPropertyChangedMemento);
 
         }
@@ -122,7 +126,7 @@ namespace WpfApp1
             if (selectedItem.Deleted)
                 return;
 
-            CslaPropertyChangedMemento<Person, Boolean> personPropertyChangedMemento = new CslaPropertyChangedMemento<Person, Boolean>(selectedItem, Person.PropertyDeleted, selectedItem.Deleted);
+            PropertyChangedMemento<PersonList, Person, Boolean> personPropertyChangedMemento = new PropertyChangedMemento<PersonList, Person, Boolean>(selectedItem, Person.PropertyDeleted, selectedItem.Deleted);
             _undoRedoHistory.CheckPoint(personPropertyChangedMemento);
 
             selectedItem.Deleted = true;

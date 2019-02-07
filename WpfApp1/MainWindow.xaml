@@ -11,14 +11,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.Resources>
-            <CollectionViewSource Filter="CollectionViewSource_Filter" x:Key="cvsPersons" IsLiveFilteringRequested="True" IsLiveSortingRequested="True"  Source="{Binding Path=Persons, RelativeSource={RelativeSource AncestorType=local:MainWindow}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <CollectionViewSource.SortDescriptions>
-                    <scm:SortDescription PropertyName="Ordinal" Direction="Ascending">
-                    </scm:SortDescription>
-                </CollectionViewSource.SortDescriptions>
-                <CollectionViewSource.LiveSortingProperties>
-                    <clr:String>Ordinal</clr:String>
-                </CollectionViewSource.LiveSortingProperties>
+            <CollectionViewSource Filter="CollectionViewSource_Filter" x:Key="cvsPersons" IsLiveFilteringRequested="True" Source="{Binding Path=Persons, RelativeSource={RelativeSource AncestorType=local:MainWindow}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <CollectionViewSource.LiveFilteringProperties>
                     <clr:String>Deleted</clr:String>
                 </CollectionViewSource.LiveFilteringProperties>
@@ -126,7 +119,7 @@
                         <DataTemplate>
                             <DockPanel>
                                 <TextBox DockPanel.Dock="Left" Tag="{Binding Path=.}" Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
-                                <Image DockPanel.Dock="Right" HorizontalAlignment="Right" Source="C:\Users\unouser\Downloads\download.png"></Image>
+                                <!--<Image DockPanel.Dock="Right" HorizontalAlignment="Right" Source="C:\Users\unouser\Downloads\download.png"></Image>-->
                             </DockPanel>
                         </DataTemplate>
 

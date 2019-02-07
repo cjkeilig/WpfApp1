@@ -78,9 +78,10 @@
     <Compile Include="Behavior.cs" />
     <Compile Include="CompoundMemento.cs" />
     <Compile Include="IAttachedObject.cs" />
+    <Compile Include="IUndoRedoHistory.cs" />
     <Compile Include="RoundStack.cs" />
     <Compile Include="ScrollIntoViewBehavior.cs" />
-    <Compile Include="UndoRedoHistory.cs" />
+    <Compile Include="ListUndoRedoHistory.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -7,22 +7,20 @@ using System.Threading.Tasks;
 namespace WpfApp1
 {
 
-    public interface IMementoWithRef<T>
-    {
-        IMemento<T> Restore(T target);
-        T GetPointer();
-    }
-
     public interface IMemento<T>
     {
         IMemento<T> Restore(T target);
-        T GetPointer();
     }
 
-    public  interface ITrack<T>
+    public interface IListTOfVMemento<T,U>
     {
-        UndoRedoHistory<T> GetTracker();
+        IListTOfVMemento<T, U> Restore(T target);
+        U GetChild();
+    }
 
+    public interface ITrack<T, U>
+    {
+        IUndoRedoHistory<T, U> GetTracker();
     }
 
 }
