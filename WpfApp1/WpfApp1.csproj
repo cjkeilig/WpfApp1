@@ -80,7 +80,6 @@
     </ApplicationDefinition>
     <Compile Include="Behaviors\Behavior.cs" />
     <Compile Include="CompoundMemento.cs" />
-    <Compile Include="Controls\ExpandCollapseGroupBox.cs" />
     <Compile Include="Converters\ExpandCollapseImageConverter.cs" />
     <Compile Include="IAttachedObject.cs" />
     <Compile Include="IUndoRedoHistory.cs" />
@@ -148,6 +147,8 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Controls\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
