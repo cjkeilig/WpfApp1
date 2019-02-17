@@ -2,8 +2,54 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:WpfApp1"
+             xmlns:converters="clr-namespace:WpfApp1.Converters"
+             xmlns:controls="clr-namespace:WpfApp1.Controls"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <converters:ExpandCollapseImageConverter x:Key="ExpandCollapseImageConverter" />
+        <fa:FontAwesomeIcon x:Key="ChevronUp">61559</fa:FontAwesomeIcon>
+        <fa:FontAwesomeIcon x:Key="ChevronDown">61560</fa:FontAwesomeIcon>
+
+        <!-- The default style for a toggle button is just a regular button, overriding -->
+        <Style x:Key="ToggleButtonCustomStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <fa:ImageAwesome Width="14" Height="14">
+                                <fa:ImageAwesome.Icon>
+                                    <MultiBinding  Converter="{StaticResource ExpandCollapseImageConverter}">
+                                        <Binding Source="{StaticResource ChevronUp}"/>
+                                        <Binding Source="{StaticResource ChevronDown}" />
+                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=controls:ExpandCollapseGroupBox}" Path="IsChecked" />
+                                    </MultiBinding>
+                                </fa:ImageAwesome.Icon>
+                            </fa:ImageAwesome>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type controls:ExpandCollapseGroupBox}" >
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ExpandCollapseGroupBox}, Path=Header}"
+                                       Foreground="Blue"></TextBlock>
+
+                            <ToggleButton Style="{DynamicResource ToggleButtonCustomStyle }" IsChecked="{Binding Path=IsChecked, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ExpandCollapseGroupBox}}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

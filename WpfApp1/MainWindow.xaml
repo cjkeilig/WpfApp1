@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:WpfApp1"
         xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:clr="clr-namespace:System;assembly=mscorlib"
+        xmlns:controls="clr-namespace:WpfApp1.Controls"
         x:Name="MainWindow1"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -51,22 +52,22 @@
 
             </Style>
         </Grid.Resources>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="32" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.Row="0">
-            <TextBlock>Test Application</TextBlock>
-            <Button Click="ButtonUndo_Click">Button 1</Button>
-            <Button Tag="{Binding ElementName=DataGrid1, Path=SelectedIndex}" Click="Button_Click" BorderBrush="#FF707070">Button 2
-            </Button>
-            <Button Click="ButtonDelete_Click" Tag="{Binding ElementName=DataGrid1, Path=SelectedItem}">Delete</Button>
-            <TextBox MinWidth="32" x:Name="ScrollToIndex"></TextBox>
-        </StackPanel>
-        <!--<ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+        <StackPanel>
+            <controls:ExpandCollapseGroupBox >
+                <StackPanel Orientation="Horizontal" >
+                    <TextBlock>Test Application</TextBlock>
+                    <Button Click="ButtonUndo_Click">Button 1</Button>
+                    <Button Tag="{Binding ElementName=DataGrid1, Path=SelectedIndex}" Click="Button_Click" BorderBrush="#FF707070">Button 2
+                    </Button>
+                    <Button Click="ButtonDelete_Click" Tag="{Binding ElementName=DataGrid1, Path=SelectedItem}">Delete</Button>
+                    <TextBox MinWidth="32" x:Name="ScrollToIndex"></TextBox>
+                </StackPanel>
+            </controls:ExpandCollapseGroupBox>
+
+            <!--<ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
             -->
-        <!--<ItemsControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" x:Name="ItemsControl1" ItemsSource="{Binding Path=Persons}">-->
-        <!--
+            <!--<ItemsControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" x:Name="ItemsControl1" ItemsSource="{Binding Path=Persons}">-->
+            <!--
             <ItemsControl ItemsSource="{Binding Path=., Source={StaticResource cvsPersons}, Mode=TwoWay}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -81,70 +82,70 @@
             </ItemsControl>
         </ScrollViewer>-->
 
-        <DataGrid
+            <DataGrid
             GridLinesVisibility="None"
             HeadersVisibility="None" 
             AutoGenerateColumns="False"
-            Grid.Row="1" 
+            
             x:Name="DataGrid1" 
             ItemsSource="{Binding Source={StaticResource cvsPersons}}">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn MinWidth="100" CellStyle="{StaticResource DefaultDataGridCellStyle}">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBox Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"  />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="BorderThickness" Value="0"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGridTemplateColumn.CellStyle>
-                    <DataGridTemplateColumn.CellTemplate>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn MinWidth="100" CellStyle="{StaticResource DefaultDataGridCellStyle}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"  />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                        <DataGridTemplateColumn.CellTemplate>
 
-                        <DataTemplate>
-                            <Label Style="{StaticResource DefaultTextBlockStyle}" VerticalContentAlignment="Center" HorizontalAlignment="Center" BorderThickness="0">=</Label>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn MinWidth="350" CellStyle="{StaticResource DefaultDataGridCellStyle}">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <DockPanel>
-                                <TextBox DockPanel.Dock="Left" Tag="{Binding Path=.}" Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
-                                <!--<Image DockPanel.Dock="Right" HorizontalAlignment="Right" Source="C:\Users\unouser\Downloads\download.png"></Image>-->
-                            </DockPanel>
-                        </DataTemplate>
+                            <DataTemplate>
+                                <Label Style="{StaticResource DefaultTextBlockStyle}" VerticalContentAlignment="Center" HorizontalAlignment="Center" BorderThickness="0">=</Label>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn MinWidth="350" CellStyle="{StaticResource DefaultDataGridCellStyle}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <TextBox DockPanel.Dock="Left" Tag="{Binding Path=.}" Style="{StaticResource DefaultTextBoxStyle}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" />
+                                    <!--<Image DockPanel.Dock="Right" HorizontalAlignment="Right" Source="C:\Users\unouser\Downloads\download.png"></Image>-->
+                                </DockPanel>
+                            </DataTemplate>
 
-                    </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
 
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-            <DataGrid.RowStyle>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                <DataGrid.RowStyle>
 
-                <Style TargetType="DataGridRow">
-                    <Setter Property="BorderThickness" Value="3" />
-                    <Setter Property="Margin" Value="3"/>
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="Green" />
-                            <Setter Property="BorderThickness" Value="3"/>
-                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="BorderThickness" Value="3" />
+                        <Setter Property="Margin" Value="3"/>
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="BorderBrush" Value="Green" />
+                                <Setter Property="BorderThickness" Value="3"/>
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
 
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.RowStyle>
-        </DataGrid>
-        
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+        </StackPanel>
     </Grid>
 </Window>
