@@ -80,7 +80,6 @@
     </ApplicationDefinition>
     <Compile Include="Behaviors\Behavior.cs" />
     <Compile Include="CompoundMemento.cs" />
-    <Compile Include="Converters\ExpandCollapseImageConverter.cs" />
     <Compile Include="IAttachedObject.cs" />
     <Compile Include="IUndoRedoHistory.cs" />
     <Compile Include="RoundStack.cs" />
@@ -149,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controls\" />
+    <Folder Include="Converters\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
